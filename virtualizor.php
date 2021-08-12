@@ -803,59 +803,6 @@ class virtualizor extends Module {
 		);
 	}
 	
-	/**
-	 * Console tab
-	 *
-	 * @param stdClass $package A stdClass object representing the current package
-	 * @param stdClass $service A stdClass object representing the current service
-	 * @param array $get Any GET parameters
-	 * @param array $post Any POST parameters
-	 * @param array $files Any FILES parameters
-	 * @return string The string representing the contents of this tab
-	 */
-	public function tabConsole($package, $service, array $get=null, array $post=null, array $files=null) {
-	
-		$this->view = new View("tab_console", "default");
-		$this->view->base_uri = $this->base_uri;
-		
-		Loader::loadHelpers($this, array("Form", "Html"));
-		
-		// Get the service fields
-		$service_fields = $this->serviceFieldsToObject($service->fields);
-		$module_row = $this->getModuleRow($package->module_row);
-		
-		if($package->meta->type != 'openvz'){
-		
-			// For the Call
-			$pass = $module_row->meta->keypass;
-			$ip = $module_row->meta->host;
-			$path = 'index.php?act=vnc&launch=1';
-			
-			$params = array('vpsid' => $service_fields->vpsid, 'access' => "enable");
-
-			$this->log($module_row->meta->host . "|VPS Console", serialize($params), "input", true);
-			
-			$response = $this->e_make_api_call($ip, $pass, $service_fields->vpsid, $path);
-			
-			if(empty($response)){
-				return false;
-			}
-		}
-		
-		// Set default vars // usually used for theme
-		if (empty($vars))
-			$vars = array('vpsid' => $service_fields->vpsid, 'vncip' => $response['info']['ip'], 'vncport' => $response['info']['port'], 'vncpassword' => $response['info']['password'], 'virt' => $package->meta->type);
-		
-		
-		$this->view->set("vars", (object)$vars);
-		$this->view->set("client_id", $service->client_id);
-		$this->view->set("service_id", $service->id);
-		
-		$this->view->set("view", $this->view->view);
-		$this->view->setDefaultView("components" . DS . "modules" . DS . "virtualizor" . DS);
-		return $this->view->fetch();
-	}
-	
 	public function virtualizor_UI($package, $service, $url, $modules_url, array $get=null, array $post=null) {
 		
 		global $virt_verify, $virt_errors;
@@ -1434,44 +1381,6 @@ class virtualizor extends Module {
 		
 		return $this->view->fetch();
 	}
-	
-	public function tabClientConsole($package, $service, array $get=null, array $post=null, array $files=null) {
-	
-		$this->view = new View("tab_client_console", "default");
-		$this->view->base_uri = $this->base_uri;
-		
-		Loader::loadHelpers($this, array("Form", "Html"));
-		
-		// Get the service fields
-		$service_fields = $this->serviceFieldsToObject($service->fields);
-		$module_row = $this->getModuleRow($package->module_row);
-		
-		if($package->meta->type != 'openvz'){
-		
-			// For the Call
-			$pass = $module_row->meta->keypass;
-			$ip = $module_row->meta->host;
-			$path = 'index.php?act=vnc&launch=1';
-			$response = $this->e_make_api_call($ip, $pass, $service_fields->vpsid, $path);
-			
-			if(empty($response)){
-				return false;
-			}
-		}
-		
-		// Set default vars // usually used for theme
-		if (empty($vars))
-			$vars = array('vpsid' => $service_fields->vpsid, 'vncip' => $response['info']['ip'], 'vncport' => $response['info']['port'], 'vncpassword' => $response['info']['password'], 'virt' => $package->meta->type);
-		
-		$this->view->set("vars", (object)$vars);
-		$this->view->set("client_id", $service->client_id);
-		$this->view->set("service_id", $service->id);
-		
-		$this->view->set("view", $this->view->view);
-		$this->view->setDefaultView("components" . DS . "modules" . DS . "virtualizor" . DS);
-		return $this->view->fetch();
-	}
-	
 	
 	/**
 	 * Returns an array of service field to set for the service using the given input
