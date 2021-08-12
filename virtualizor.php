@@ -804,50 +804,6 @@ class virtualizor extends Module {
 	}
 	
 	/**
-	 * Statistics tab (bandwidth/disk usage)
-	 *
-	 * @param stdClass $package A stdClass object representing the current package
-	 * @param stdClass $service A stdClass object representing the current service
-	 * @param array $get Any GET parameters
-	 * @param array $post Any POST parameters
-	 * @param array $files Any FILES parameters
-	 * @return string The string representing the contents of this tab
-	 */
-	public function tabStats($package, $service, array $get=null, array $post=null, array $files=null) {
-	
-		$this->view = new View("tab_stats", "default");
-		$this->view->base_uri = $this->base_uri;
-		
-		Loader::loadHelpers($this, array("Form", "Html"));
-		
-		// Get the service fields
-		$service_fields = $this->serviceFieldsToObject($service->fields);
-		$module_row = $this->getModuleRow($package->module_row);
-		
-		// For the Call
-		$pass = $module_row->meta->keypass;
-		$ip = $module_row->meta->host;
-		$path = 'index.php?act=vpsmanage&';
-		$response = $this->e_make_api_call($ip, $pass, $service_fields->vpsid, $path);
-		
-		if(empty($response)){
-			$this->Input->setErrors(array('api' => array('internal' => Language::_("virtualizor.!error.api.internal", true))));
-		}
-		
-		// Set default vars // usually used for theme
-		if (empty($vars))
-			$vars = array('vpsid' => $service_fields->vpsid, 'stats' => $response, 'virt' => $package->meta->type);
-		
-		$this->view->set("vars", (object)$vars);
-		$this->view->set("client_id", $service->client_id);
-		$this->view->set("service_id", $service->id);
-		
-		$this->view->set("view", $this->view->view);
-		$this->view->setDefaultView("components" . DS . "modules" . DS . "virtualizor" . DS);
-		return $this->view->fetch();
-	}
-	
-	/**
 	 * Console tab
 	 *
 	 * @param stdClass $package A stdClass object representing the current package
@@ -1476,41 +1432,6 @@ class virtualizor extends Module {
 		$this->view->set("view", $this->view->view);
 		$this->view->setDefaultView("components" . DS . "modules" . DS . "virtualizor" . DS);
 		
-		return $this->view->fetch();
-	}
-	
-	public function tabClientStats($package, $service, array $get=null, array $post=null, array $files=null) {
-	
-		$this->view = new View("tab_client_stats", "default");
-		$this->view->base_uri = $this->base_uri;
-		
-		Loader::loadHelpers($this, array("Form", "Html"));
-		
-		// Get the service fields
-		$service_fields = $this->serviceFieldsToObject($service->fields);
-		$module_row = $this->getModuleRow($package->module_row);
-		
-		// For the Call
-		$pass = $module_row->meta->keypass;
-		$ip = $module_row->meta->host;
-		$path = 'index.php?act=vpsmanage&';
-		
-		$response = $this->e_make_api_call($ip, $pass, $service_fields->vpsid, $path);
-		
-		if(empty($response)){
-			$this->Input->setErrors(array('api' => array('internal' => Language::_("virtualizor.!error.api.internal", true))));
-		}
-		
-		// Set default vars // usually used for theme
-		if (empty($vars))
-			$vars = array('vpsid' => $service_fields->vpsid, 'stats' => $response, 'virt' => $package->meta->type);
-		
-		$this->view->set("vars", (object)$vars);
-		$this->view->set("client_id", $service->client_id);
-		$this->view->set("service_id", $service->id);
-		
-		$this->view->set("view", $this->view->view);
-		$this->view->setDefaultView("components" . DS . "modules" . DS . "virtualizor" . DS);
 		return $this->view->fetch();
 	}
 	
