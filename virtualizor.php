@@ -28,7 +28,7 @@ class virtualizor extends Module {
 	 */
 	public function __construct() {
 		// Load components required by this module
-		Loader::loadComponents($this, array("Input"));
+		Loader::loadComponents($this, array("Input", "Services"));
 		
 		// Load the language required by this module
 		Language::loadLang("virtualizor", null, dirname(__FILE__) . DS . "language" . DS);
@@ -962,6 +962,22 @@ class virtualizor extends Module {
 			$res['uid'] = 0;
 			
 			echo json_encode($res);
+
+            if (!empty($res['done'])) {
+                // 'done' will not be empty if the API call was successful
+                // Make changes to the database if needed
+                switch ($get['act']) {
+                    case "hostname":
+                        $this->Services->editField($service->id, [
+                            'key' => 'virtualizor_domain',
+                            'value' => $_POST['newhost'],
+                        ]);
+                        break;
+                    default:
+                        break;
+                }    
+            }
+
 			die();	
 			exit(0);
 			
