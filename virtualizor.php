@@ -2017,9 +2017,7 @@ class virtualizor extends Module {
 		
 		// Get the service fields
 		$service_fields = $this->serviceFieldsToObject($service->fields);
-		
-		$params = $this->getFieldsFromInput((array)$vars, $package);
-				
+						
 		// If the service was created wihtout using the module, we wonr get vpsid.
 		// If user wants to add it afterward we will get the vpsid from $_POST
 		if(empty($service_fields->vpsid) && !empty($_POST['vpsid'])){
@@ -2073,9 +2071,8 @@ class virtualizor extends Module {
 			}
 			// Check for fields that changed
 			$edit_fields = array();
-			foreach($params as $key=>$value){
-				
-				if(!array_key_exists($key,$service_fields) || $params[$key] !=$service_fields->$key){
+			foreach($vars as $key=>$value){
+				if(!array_key_exists($key,$service_fields) || $vars[$key] !=$service_fields->$key){
 					$edit_fields[$key] = $value;
 				}
 			}
@@ -2083,16 +2080,16 @@ class virtualizor extends Module {
 			if ($vars['use_module'] == "true") {
 				
 				//Update Hostname
-				if (isset($edit_fields['domain'])) {
-					$post_vps['hostname'] = $edit_fields['domain'];
-					$service_fields->virtualizor_domain = $edit_fields['domain'];
+				if (isset($edit_fields['virtualizor_domain'])) {
+					$post_vps['hostname'] = $edit_fields['virtualizor_domain'];
+					$service_fields->virtualizor_domain = $edit_fields['virtualizor_domain'];
 				}
 				
 				// Update root password (if changed)
-				if (isset($edit_fields['password'])) {				
-					$post_vps['rootpass'] = $edit_fields['password'];
-					$service_fields->virtualizor_rootpass = $edit_fields['password'];
-					$service_fields->virtualizor_password = $edit_fields['password'];
+				if (isset($edit_fields['virtualizor_password'])) {				
+					$post_vps['rootpass'] = $edit_fields['virtualizor_password'];
+					$service_fields->virtualizor_rootpass = $edit_fields['virtualizor_password'];
+					$service_fields->virtualizor_password = $edit_fields['virtualizor_password'];
 				}
 				
 				// Set virtual server ID if changed
