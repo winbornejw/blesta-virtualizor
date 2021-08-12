@@ -2120,6 +2120,20 @@ class virtualizor extends Module {
 					$this->Input->setErrors(array('api' => array('internal' => 'Edit Error :'.$edit_error)));
 					return;
 				}
+
+                // Update the IP fields if the API call was successful
+                $ips = $ret['vps']['ips'];
+                $primary_ip = isset($ips[0]) ? $ips[0] : '';
+                $additional_ips = array_slice($ips, 1);
+                if (!empty($ret['vps']['ips6_subnet'])) {
+                    $additional_ips = array_merge($additional_ips, $ret['vps']['ips6_subnet']);
+                }
+                if (!empty($ret['vps']['ips6'])) {
+                    $additional_ips = array_merge($additional_ips, $ret['vps']['ips6']);
+                }
+
+                $service_fields->virtualizor_ip = $primary_ip;
+                $service_fields->virtualizor_additional_ips = !empty($additional_ips) ? implode(', ', $additional_ips) : null;
 			}
 		}
 	
