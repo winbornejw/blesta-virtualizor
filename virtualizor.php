@@ -2013,7 +2013,7 @@ class virtualizor extends Module {
 	public function editService($package, $service, array $vars= null, $parent_package=null, $parent_service=null) {
 		
 		$module_row = $this->getModuleRow($package->module_row);
-		$encrypted_fields = array("key", "keypass");
+		$encrypted_fields = array("virtualizor_password", "virtualizor_rootpass");
 		
 		// Get the service fields
 		$service_fields = $this->serviceFieldsToObject($service->fields);
