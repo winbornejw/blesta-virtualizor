@@ -968,6 +968,7 @@ class virtualizor extends Module {
                 // Make changes to the database if needed
                 switch ($get['act']) {
                     case "hostname":
+                        // The hostname was changed, update the database
                         $this->Services->editField($service->id, [
                             'key' => 'virtualizor_domain',
                             'value' => $_POST['newhost'],
