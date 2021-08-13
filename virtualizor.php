@@ -1469,12 +1469,12 @@ class virtualizor extends Module {
 		$row = $this->getModuleRow();
 		
         // Replace 'virtualizor_password' if 'random_password' is set
-        if (isset($this->package->meta->random_password) && $this->package->meta->random_password) {
+        if (isset($package->meta->random_password) && $package->meta->random_password) {
             $vars['virtualizor_password'] = $this->generatePassword();
         }
 
 		$params = $this->getFieldsFromInput((array)$vars, $package);
-		
+
 		// Get the client details 
 		Loader::loadModels($this, array("Clients"));
 		$clients = $this->Clients->get($vars['client_id'], false);
