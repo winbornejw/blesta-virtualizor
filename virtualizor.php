@@ -1468,6 +1468,11 @@ class virtualizor extends Module {
 		// This fetches the Server according to package selected.
 		$row = $this->getModuleRow();
 		
+        // Replace 'virtualizor_password' if 'random_password' is set
+        if (isset($this->package->meta->random_password) && $this->package->meta->random_password) {
+            $vars['virtualizor_password'] = $this->generatePassword();
+        }
+
 		$params = $this->getFieldsFromInput((array)$vars, $package);
 		
 		// Get the client details 
@@ -2654,6 +2659,29 @@ class virtualizor extends Module {
 		return $obj->systemDecrypt($enc_pass);
 		
 	}
+
+    /**
+     * Generates a password for client accounts and VPSs
+     *
+     * @param int $min_chars The minimum number of characters to generate in the password (optional, default 12)
+     * @param int $max_chars The maximum number of characters to generate in the password (optional, default 12)
+     * @return string A randomly-generated password
+     */
+    private function generatePassword($min_chars = 12, $max_chars = 12)
+    {
+        $password = '';
+        $pool = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
+
+        $pool_size = strlen($pool);
+        $length = (int)abs($min_chars == $max_chars ? $min_chars : mt_rand($min_chars, $max_chars));
+
+        for ($i=0; $i<$length; $i++) {
+            $password .= substr($pool, mt_rand(0, $pool_size-1), 1);
+        }
+
+        return $password;
+    }
+
 }
 
 ?>
