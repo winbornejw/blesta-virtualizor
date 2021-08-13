@@ -2058,8 +2058,6 @@ class virtualizor extends Module {
 		// Get the service fields
 		$service_fields = $this->serviceFieldsToObject($service->fields);
 		
-		$params = $this->getFieldsFromInput((array)$vars, $package);
-						
 		// If the service was created wihtout using the module, we wonr get vpsid.
 		// If user wants to add it afterward we will get the vpsid from $_POST
 		if(empty($service_fields->vpsid) && !empty($_POST['vpsid'])){
@@ -2113,9 +2111,8 @@ class virtualizor extends Module {
 			}
 			// Check for fields that changed
 			$edit_fields = array();
-			foreach($params as $key=>$value){
-				
-				if(!array_key_exists($key,$service_fields) || $params[$key] !=$service_fields->$key){
+			foreach($vars as $key=>$value){
+				if(!array_key_exists($key,$service_fields) || $vars[$key] !=$service_fields->$key){
 					$edit_fields[$key] = $value;
 				}
 			}
