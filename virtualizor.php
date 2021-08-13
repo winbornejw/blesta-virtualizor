@@ -400,6 +400,16 @@ class virtualizor extends Module {
 		$_tmp_url = basename($GLOBALS['_ENV']['HTTP_REFERER']);
 		
 		$fields->setHtml("
+            <style>
+                .virt-header {
+                    font-weight: bold; 
+                    font-size: larger; 
+                    margin: 25px 0 -5px 0; 
+                    border-bottom: 1px solid; 
+                    width: 100%; 
+                    display: block;
+                }
+            </style>        
 			<script type=\"text/javascript\">
 				$(document).ready(function() {
 					togglevirtualizor_fields();
@@ -423,6 +433,10 @@ class virtualizor extends Module {
 				}
 			</script>");
 		
+        $vps_settings_label = $fields->label(Language::_('virtualizor.package_fields.vps_settings_heading', true), null, array('class' => 'virt-header'));
+        $fields->setField($vps_settings_label);
+        unset($vps_settings_label);
+
 		// Set the virtualizor type as a selectable option
 		$types = array('' => Language::_("virtualizor.please_select", true)) + $this->getTypes();
 		$type = $fields->label(Language::_("virtualizor.package_fields.type", true), "kernel");
@@ -591,6 +605,18 @@ class virtualizor extends Module {
 			
 			$this->log($module_row->meta->host . "|List Plans", serialize($plan), "input", true);
 		}
+
+        // Extra Settings
+        $extra_settings_label = $fields->label(Language::_('virtualizor.package_fields.extra_settings_heading', true), null, array('class' => 'virt-header'));
+        $fields->setField($extra_settings_label);
+        unset($extra_settings_label);
+
+        // Random Password field
+        $random_password = $fields->label(Language::_("virtualizor.package_fields.random_password", true), "random_password");
+        $random_password->attach($fields->fieldCheckbox("meta[random_password]", true, $this->Html->ifSet($vars->meta['random_password']), array('id' => "random_password")));
+        $random_password->attach($fields->tooltip(Language::_('virtualizor.package_fields.random_password_tooltip', true)));        
+        $fields->setField($random_password);
+        unset($random_password);
 
 		return $fields;
 	}
