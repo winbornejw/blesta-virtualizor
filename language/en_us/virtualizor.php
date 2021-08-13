@@ -87,6 +87,12 @@ $lang['virtualizor.package_fields.plan'] = "Plan";
 $lang['virtualizor.package_fields.assigned_nodes'] = "Assigned Nodes";
 $lang['virtualizor.package_fields.available_nodes'] = "Available Nodes";
 
+$lang['virtualizor.package_fields.vps_settings_heading'] = "VPS Settings";
+$lang['virtualizor.package_fields.extra_settings_heading'] = "Additional Settings";
+
+$lang['virtualizor.package_fields.random_password'] = "Randomize Password";
+$lang['virtualizor.package_fields.random_password_tooltip'] = "If checked, there will be no prompts for a password when creating a service.";
+
 
 
 // ERROR CODES
