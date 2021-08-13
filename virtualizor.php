@@ -1393,12 +1393,12 @@ class virtualizor extends Module {
 		
 		
 		$fields = array(
-			'domain' => isset($vars['virtualizor_domain']) ? $vars['virtualizor_domain'] : null,
-			'username' => isset($vars['virtualizor_username']) ? $vars['virtualizor_username']: null,
-			'password' => isset($vars['virtualizor_password']) ? $vars['virtualizor_password'] : null,
-			'confirm_password' => isset($vars['virtualizor_confirm_password']) ? $vars['virtualizor_confirm_password'] : null,
-			'ns1' => isset($vars['virtualizor_ns1']) ? $vars['virtualizor_ns1'] : null,
-			'ns2' => isset($vars['virtualizor_ns2']) ? $vars['virtualizor_ns2'] : null,
+			'virtualizor_domain' => isset($vars['virtualizor_domain']) ? $vars['virtualizor_domain'] : null,
+			'virtualizor_username' => isset($vars['virtualizor_username']) ? $vars['virtualizor_username']: null,
+			'virtualizor_password' => isset($vars['virtualizor_password']) ? $vars['virtualizor_password'] : null,
+			'virtualizor_confirm_password' => isset($vars['virtualizor_confirm_password']) ? $vars['virtualizor_confirm_password'] : null,
+			'virtualizor_ns1' => isset($vars['virtualizor_ns1']) ? $vars['virtualizor_ns1'] : null,
+			'virtualizor_ns2' => isset($vars['virtualizor_ns2']) ? $vars['virtualizor_ns2'] : null,
 			'OS' => isset($vars['OS']) ? $vars['OS'] : null
 		);
 		
@@ -1530,8 +1530,8 @@ class virtualizor extends Module {
 					$post['os_name'] = $OS = strtolower(trim($OSlist[$vars['OS']]));
 				}
 				
-				$post['hostname'] = $params["domain"];
-				$post['rootpass'] = $params["password"];
+				$post['hostname'] = $params["virtualizor_domain"];
+				$post['rootpass'] = $params["virtualizor_password"];
 				// Pass the user details 
 				$post['user_email'] = $clients->email;
 				$post['user_pass'] = $vars['virtualizor_password'];
@@ -1860,8 +1860,8 @@ class virtualizor extends Module {
 				}
 				
 				// Other Details as well
-				$post['hostname'] = $params["domain"];
-				$post['rootpass'] = $params["password"];
+				$post['hostname'] = $params["virtualizor_domain"];
+				$post['rootpass'] = $params["virtualizor_password"];
 				$post['space'] = (empty($package->meta->hdd) ? 0 : $package->meta->hdd);
 				$post['ram'] = (empty($package->meta->ram) ? 0 : $package->meta->ram);
 				$post['bandwidth'] = (empty($package->meta->bandwidth) ? 0 : $package->meta->bandwidth);
@@ -2013,10 +2013,12 @@ class virtualizor extends Module {
 	public function editService($package, $service, array $vars= null, $parent_package=null, $parent_service=null) {
 		
 		$module_row = $this->getModuleRow($package->module_row);
-		$encrypted_fields = array("virtualizor_password", "virtualizor_rootpass");
+		$encrypted_fields = array("virtualizor_rootpass", "virtualizor_password");
 		
 		// Get the service fields
 		$service_fields = $this->serviceFieldsToObject($service->fields);
+		
+		$params = $this->getFieldsFromInput((array)$vars, $package);
 						
 		// If the service was created wihtout using the module, we wonr get vpsid.
 		// If user wants to add it afterward we will get the vpsid from $_POST
@@ -2071,8 +2073,9 @@ class virtualizor extends Module {
 			}
 			// Check for fields that changed
 			$edit_fields = array();
-			foreach($vars as $key=>$value){
-				if(!array_key_exists($key,$service_fields) || $vars[$key] !=$service_fields->$key){
+			foreach($params as $key=>$value){
+				
+				if(!array_key_exists($key,$service_fields) || $params[$key] !=$service_fields->$key){
 					$edit_fields[$key] = $value;
 				}
 			}
