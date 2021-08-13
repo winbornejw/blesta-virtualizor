@@ -294,13 +294,16 @@ class virtualizor extends Module {
 		$fields->setField($domain);
 		unset($domain);
 		
-		// Create password label
-		$password = $fields->label(Language::_("virtualizor.password", true), "virtualizor_password");
-		// Create password field and attach to password label
-		$password->attach($fields->fieldText("virtualizor_password", $this->Html->ifSet($vars->virtualizor_password), array('id'=>"virtualizor_password")));
-		// Set the label as a field
-		$fields->setField($password);
-		unset($password);
+        // Only show the password field if the package does not use random passwords
+        if (!$package->meta->random_password) {
+            // Create password label
+            $password = $fields->label(Language::_("virtualizor.password", true), "virtualizor_password");
+            // Create password field and attach to password label
+            $password->attach($fields->fieldText("virtualizor_password", $this->Html->ifSet($vars->virtualizor_password), array('id'=>"virtualizor_password")));
+            // Set the label as a field
+            $fields->setField($password);
+            unset($password);
+        }
 		
 		// OS Template as a selectable option
 		$os_temp = array('' => Language::_("virtualizor.please_select", true)) + $this->getTemplates($package);
@@ -667,22 +670,25 @@ class virtualizor extends Module {
 		$fields->setField($domain);
 		unset($domain);
 		
-		// Create password label
-		$password = $fields->label(Language::_("virtualizor.password", true), "virtualizor_password");
-		// Create password field and attach to password label
-		$password->attach($fields->fieldPassword("virtualizor_password", array('id'=>"virtualizor_password")));
-		// Set the label as a field
-		$fields->setField($password);
-		
-		unset($password);
-		
-		// Confirm password label
-		$confirm_password = $fields->label(Language::_("virtualizor.confirm_password", true), "virtualizor_confirm_password");
-		// Create confirm password field and attach to password label
-		$confirm_password->attach($fields->fieldPassword("virtualizor_confirm_password", array('id'=>"virtualizor_confirm_password")));
-		// Set the label as a field
-		$fields->setField($confirm_password);
-		unset($confirm_password);
+        // Only show the password field if the package does not use random passwords
+        if (!$package->meta->random_password) {
+            // Create password label
+            $password = $fields->label(Language::_("virtualizor.password", true), "virtualizor_password");
+            // Create password field and attach to password label
+            $password->attach($fields->fieldPassword("virtualizor_password", array('id'=>"virtualizor_password")));
+            // Set the label as a field
+            $fields->setField($password);
+            
+            unset($password);
+        
+            // Confirm password label
+            $confirm_password = $fields->label(Language::_("virtualizor.confirm_password", true), "virtualizor_confirm_password");
+            // Create confirm password field and attach to password label
+            $confirm_password->attach($fields->fieldPassword("virtualizor_confirm_password", array('id'=>"virtualizor_confirm_password")));
+            // Set the label as a field
+            $fields->setField($confirm_password);
+            unset($confirm_password);
+        }
 
 		// OS Template as a selectable option
 		$os_temp = array('' => Language::_("virtualizor.please_select", true)) + $this->getTemplates($package);
@@ -725,12 +731,15 @@ class virtualizor extends Module {
 		// Set the label as a field
 		$fields->setField($username);
 		
-		// Create password label
-		$password = $fields->label(Language::_("virtualizor.password", true), "virtualizor_password");
-		// Create password field and attach to password label
-		$password->attach($fields->fieldText("virtualizor_password", $this->Html->ifSet($vars->virtualizor_password), array('id'=>"virtualizor_password")));
-		// Set the label as a field
-		$fields->setField($password);
+        // Only show the password field if the package does not use random passwords
+        if (!$package->meta->random_password) {
+            // Create password label
+            $password = $fields->label(Language::_("virtualizor.password", true), "virtualizor_password");
+            // Create password field and attach to password label
+            $password->attach($fields->fieldText("virtualizor_password", $this->Html->ifSet($vars->virtualizor_password), array('id'=>"virtualizor_password")));
+            // Set the label as a field
+            $fields->setField($password);
+        }
 
 		// OS Template as a selectable option
 		$os_temp = array('' => Language::_("virtualizor.please_select", true)) + $this->getTemplates($package);
