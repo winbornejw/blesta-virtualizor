@@ -308,13 +308,16 @@ class virtualizor extends Module {
 			unset($password);
 		}
 		
-		// OS Template as a selectable option
-		$os_temp = array('' => Language::_("virtualizor.please_select", true)) + $this->getTemplates($package);
-		$OS = $fields->label(Language::_("virtualizor.os", true), "OS");
-		$OS->attach($fields->fieldSelect("OS", $os_temp, $this->Html->ifSet($vars->OS), array('id' => "OS")));
-		$fields->setField($OS);
-		unset($OS);
-		
+		// Optionally hide the OS field
+		if (!Configure::get('Virtualizor.no_OS_field')) {
+			// OS Template as a selectable option
+			$os_temp = array('' => Language::_("virtualizor.please_select", true)) + $this->getTemplates($package);
+			$OS = $fields->label(Language::_("virtualizor.os", true), "OS");
+			$OS->attach($fields->fieldSelect("OS", $os_temp, $this->Html->ifSet($vars->OS), array('id' => "OS")));
+			$fields->setField($OS);
+			unset($OS);
+		}
+
 		$fields->setHTML("<script type=\"text/javascript\">
 		$(document).ready(function(){
 			$('#virtualizor_domain, #virtualizor_password').attr('required', true);
@@ -549,11 +552,14 @@ class virtualizor extends Module {
 			$fields->setField($server_group);
 			unset($server_group);
 			
-			// OS field
-			$OS = $fields->label("OS Templates", "OS");
-			$OS->attach($fields->fieldText("meta[OS]", $this->Html->ifSet($vars->meta['OS']), array('id'=>"OS")));
-			$fields->setField($OS);
-			unset($OS);
+			// Optionally hide the OS field
+			if (!Configure::get('Virtualizor.no_OS_field')) {
+				// OS field
+				$OS = $fields->label("OS Templates", "OS");
+				$OS->attach($fields->fieldText("meta[OS]", $this->Html->ifSet($vars->meta['OS']), array('id'=>"OS")));
+				$fields->setField($OS);
+				unset($OS);
+			}
 			
 			// Virtio field
 			$virtio = $fields->label("Virt IO", "virtio");
@@ -589,12 +595,15 @@ class virtualizor extends Module {
 			$this->Html->ifSet($vars->meta['sg']), array('id' => "server_groups")));					
 			$fields->setField($server_groups);
 
-			// OS field
-			$OS = $fields->label("OS Templates", "OS");
-			$OS->attach($fields->fieldText("meta[OS]", $this->Html->ifSet($vars->meta['OS']), array('id'=>"OS")));
-			$fields->setField($OS);
-			unset($OS);
-			
+			// Optionally hide the OS field
+			if (!Configure::get('Virtualizor.no_OS_field')) {
+				// OS field
+				$OS = $fields->label("OS Templates", "OS");
+				$OS->attach($fields->fieldText("meta[OS]", $this->Html->ifSet($vars->meta['OS']), array('id'=>"OS")));
+				$fields->setField($OS);
+				unset($OS);
+			}
+
 			$this->log($module_row->meta->host . "|List Plans", serialize($plan), "input", true);
 		}
 
@@ -667,13 +676,16 @@ class virtualizor extends Module {
 			unset($confirm_password);
 		}
 
-		// OS Template as a selectable option
-		$os_temp = array('' => Language::_("virtualizor.please_select", true)) + $this->getTemplates($package);
-		$OS = $fields->label(Language::_("virtualizor.os", true), "OS");
-		$OS->attach($fields->fieldSelect("OS", $os_temp, $this->Html->ifSet($vars->OS), array('id' => "OS")));
-		$fields->setField($OS);
-		unset($OS);
-		
+		// Optionally hide the OS field
+		if (!Configure::get('Virtualizor.no_OS_field')) {
+			// OS Template as a selectable option
+			$os_temp = array('' => Language::_("virtualizor.please_select", true)) + $this->getTemplates($package);
+			$OS = $fields->label(Language::_("virtualizor.os", true), "OS");
+			$OS->attach($fields->fieldSelect("OS", $os_temp, $this->Html->ifSet($vars->OS), array('id' => "OS")));
+			$fields->setField($OS);
+			unset($OS);
+		}
+
 		$fields->setHTML("<script type=\"text/javascript\">
 		$(document).ready(function(){
 			$('#virtualizor_domain, #virtualizor_confirm_password, #virtualizor_password').attr('required', true);
@@ -718,12 +730,15 @@ class virtualizor extends Module {
 			$fields->setField($password);
 		}
 
-		// OS Template as a selectable option
-		$os_temp = array('' => Language::_("virtualizor.please_select", true)) + $this->getTemplates($package);
-		$OS = $fields->label(Language::_("virtualizor.os", true), "OS");
-		$OS->attach($fields->fieldSelect("OS", $os_temp, $this->Html->ifSet($vars->OS), array('id' => "OS")));
-		$fields->setField($OS);
-		unset($OS);
+		// Optionally hide the OS field
+		if (!Configure::get('Virtualizor.no_OS_field')) {
+			// OS Template as a selectable option
+			$os_temp = array('' => Language::_("virtualizor.please_select", true)) + $this->getTemplates($package);
+			$OS = $fields->label(Language::_("virtualizor.os", true), "OS");
+			$OS->attach($fields->fieldSelect("OS", $os_temp, $this->Html->ifSet($vars->OS), array('id' => "OS")));
+			$fields->setField($OS);
+			unset($OS);
+		}
 		
 		// vpsid
 		$vpsid = $fields->label("vpsid", "vpsid");
@@ -2014,7 +2029,12 @@ class virtualizor extends Module {
 			),
 			array(
 				'key' => "OS",
-				'value' => $vars['OS'],
+				'value' => isset($vars['OS']) ? $vars['OS'] : 0,
+				'encrypted' => 0
+			),
+			array(
+				'key' => "virtualizor_osid",
+				'value' => isset($ret['newvs']['osid']) ? $ret['newvs']['osid'] : null,
 				'encrypted' => 0
 			),
 			array(
