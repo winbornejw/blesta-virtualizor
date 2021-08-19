@@ -28,7 +28,7 @@ class virtualizor extends Module {
 	 */
 	public function __construct() {
 		// Load components required by this module
-		Loader::loadComponents($this, array("Input"));
+		Loader::loadComponents($this, array("Input", "Services"));
 		
 		// Load the language required by this module
 		Language::loadLang("virtualizor", null, dirname(__FILE__) . DS . "language" . DS);
@@ -962,6 +962,52 @@ class virtualizor extends Module {
 			$res['uid'] = 0;
 			
 			echo json_encode($res);
+
+            if (!empty($res['done'])) {
+                // 'done' will not be empty if the API call was successful
+                // Make changes to the database if needed
+                switch ($get['act']) {
+                    case "hostname":
+                        // The hostname was changed, update the database
+                        $this->Services->editField($service->id, [
+                            'key' => 'virtualizor_domain',
+                            'value' => $_POST['newhost'],
+                        ]);
+                        break;
+                    case "ips":
+                        // The IPs were changed, update the database
+                        // Not all IPv6 addresses are in $res, so we need another API call
+                        // The managevps action returns Ipv4 and IPv6 addresses separately
+                        $path = 'index.php?act=managevps&vpsid=' . $get['svs'];
+                        $res = $this->make_api_call($ip, $pass, $path);
+
+                        $ips = $res['vps']['ips'];
+                        $primary_ip = reset($ips); // Returns the first element or false
+
+                        $additional_ips = array_slice($ips, 1);
+                        if (!empty($res['vps']['ips6_subnet'])) {
+                            $additional_ips = array_merge($additional_ips, $res['vps']['ips6_subnet']);
+                        }
+                        if (!empty($res['vps']['ips6'])) {
+                            $additional_ips = array_merge($additional_ips, $res['vps']['ips6']);
+                        }
+        
+                        $this->Services->editField($service->id, [
+                            'key' => 'virtualizor_ip',
+                            'value' => $primary_ip,
+                        ]);
+
+                        $this->Services->editField($service->id, [
+                            'key' => 'virtualizor_additional_ips',
+                            'value' => !empty($additional_ips) ? implode(', ', $additional_ips) : null,
+                        ]);
+
+                        break;
+                    default:
+                        break;
+                }    
+            }
+
 			die();	
 			exit(0);
 			
