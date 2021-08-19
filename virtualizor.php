@@ -32,6 +32,9 @@ class virtualizor extends Module {
 		
 		// Load the language required by this module
 		Language::loadLang("virtualizor", null, dirname(__FILE__) . DS . "language" . DS);
+
+		// Load config
+		Configure::load('virtualizor', dirname(__FILE__) . DS . 'config' . DS);
 	}	
 	
 	/**
@@ -293,14 +296,17 @@ class virtualizor extends Module {
 		// Set the label as a field
 		$fields->setField($domain);
 		unset($domain);
-		
-		// Create password label
-		$password = $fields->label(Language::_("virtualizor.password", true), "virtualizor_password");
-		// Create password field and attach to password label
-		$password->attach($fields->fieldText("virtualizor_password", $this->Html->ifSet($vars->virtualizor_password), array('id'=>"virtualizor_password")));
-		// Set the label as a field
-		$fields->setField($password);
-		unset($password);
+
+		// Only show the password field if the global config does not use random passwords		
+		if (!Configure::get('Virtualizor.generate_random_password')) {
+			// Create password label
+			$password = $fields->label(Language::_("virtualizor.password", true), "virtualizor_password");
+			// Create password field and attach to password label
+			$password->attach($fields->fieldText("virtualizor_password", $this->Html->ifSet($vars->virtualizor_password), array('id'=>"virtualizor_password")));
+			// Set the label as a field
+			$fields->setField($password);
+			unset($password);
+		}
 		
 		// OS Template as a selectable option
 		$os_temp = array('' => Language::_("virtualizor.please_select", true)) + $this->getTemplates($package);
@@ -641,22 +647,25 @@ class virtualizor extends Module {
 		$fields->setField($domain);
 		unset($domain);
 		
-		// Create password label
-		$password = $fields->label(Language::_("virtualizor.password", true), "virtualizor_password");
-		// Create password field and attach to password label
-		$password->attach($fields->fieldPassword("virtualizor_password", array('id'=>"virtualizor_password")));
-		// Set the label as a field
-		$fields->setField($password);
-		
-		unset($password);
-		
-		// Confirm password label
-		$confirm_password = $fields->label(Language::_("virtualizor.confirm_password", true), "virtualizor_confirm_password");
-		// Create confirm password field and attach to password label
-		$confirm_password->attach($fields->fieldPassword("virtualizor_confirm_password", array('id'=>"virtualizor_confirm_password")));
-		// Set the label as a field
-		$fields->setField($confirm_password);
-		unset($confirm_password);
+        // Only show the password field if the global config does not use random passwords		
+		if (!Configure::get('Virtualizor.generate_random_password')) {
+			// Create password label
+			$password = $fields->label(Language::_("virtualizor.password", true), "virtualizor_password");
+			// Create password field and attach to password label
+			$password->attach($fields->fieldPassword("virtualizor_password", array('id'=>"virtualizor_password")));
+			// Set the label as a field
+			$fields->setField($password);
+			
+			unset($password);
+			
+			// Confirm password label
+			$confirm_password = $fields->label(Language::_("virtualizor.confirm_password", true), "virtualizor_confirm_password");
+			// Create confirm password field and attach to password label
+			$confirm_password->attach($fields->fieldPassword("virtualizor_confirm_password", array('id'=>"virtualizor_confirm_password")));
+			// Set the label as a field
+			$fields->setField($confirm_password);
+			unset($confirm_password);
+		}
 
 		// OS Template as a selectable option
 		$os_temp = array('' => Language::_("virtualizor.please_select", true)) + $this->getTemplates($package);
@@ -699,12 +708,15 @@ class virtualizor extends Module {
 		// Set the label as a field
 		$fields->setField($username);
 		
-		// Create password label
-		$password = $fields->label(Language::_("virtualizor.password", true), "virtualizor_password");
-		// Create password field and attach to password label
-		$password->attach($fields->fieldText("virtualizor_password", $this->Html->ifSet($vars->virtualizor_password), array('id'=>"virtualizor_password")));
-		// Set the label as a field
-		$fields->setField($password);
+		// Only show the password field if the global config does not use random passwords		
+		if (!Configure::get('Virtualizor.generate_random_password')) {
+			// Create password label
+			$password = $fields->label(Language::_("virtualizor.password", true), "virtualizor_password");
+			// Create password field and attach to password label
+			$password->attach($fields->fieldText("virtualizor_password", $this->Html->ifSet($vars->virtualizor_password), array('id'=>"virtualizor_password")));
+			// Set the label as a field
+			$fields->setField($password);
+		}
 
 		// OS Template as a selectable option
 		$os_temp = array('' => Language::_("virtualizor.please_select", true)) + $this->getTemplates($package);
@@ -1479,6 +1491,10 @@ class virtualizor extends Module {
 		// This fetches the Server according to package selected.
 		$row = $this->getModuleRow();
 		
+        // Replace 'virtualizor_password' if 'random_password' is set
+        if (Configure::get('Virtualizor.generate_random_password')) {
+            $vars['virtualizor_password'] = $this->generatePassword();
+		}
 		$params = $this->getFieldsFromInput((array)$vars, $package);
 		
 		// Get the client details 
@@ -2064,8 +2080,6 @@ class virtualizor extends Module {
 		// Get the service fields
 		$service_fields = $this->serviceFieldsToObject($service->fields);
 		
-		$params = $this->getFieldsFromInput((array)$vars, $package);
-						
 		// If the service was created wihtout using the module, we wonr get vpsid.
 		// If user wants to add it afterward we will get the vpsid from $_POST
 		if(empty($service_fields->vpsid) && !empty($_POST['vpsid'])){
@@ -2119,9 +2133,9 @@ class virtualizor extends Module {
 			}
 			// Check for fields that changed
 			$edit_fields = array();
-			foreach($params as $key=>$value){
+			foreach($vars as $key=>$value){
 				
-				if(!array_key_exists($key,$service_fields) || $params[$key] !=$service_fields->$key){
+				if(!array_key_exists($key,$service_fields) || $vars[$key] !=$service_fields->$key){
 					$edit_fields[$key] = $value;
 				}
 			}
@@ -2679,6 +2693,28 @@ class virtualizor extends Module {
 		return $obj->systemDecrypt($enc_pass);
 		
 	}
+
+    /**
+     * Generates a password for client accounts and VPSs
+     *
+     * @param int $min_chars The minimum number of characters to generate in the password (optional, default 12)
+     * @param int $max_chars The maximum number of characters to generate in the password (optional, default 12)
+     * @return string A randomly-generated password
+     */
+    private function generatePassword($min_chars = 12, $max_chars = 12)
+    {
+        $password = '';
+        $pool = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
+
+        $pool_size = strlen($pool);
+        $length = (int)abs($min_chars == $max_chars ? $min_chars : mt_rand($min_chars, $max_chars));
+
+        for ($i=0; $i<$length; $i++) {
+            $password .= substr($pool, mt_rand(0, $pool_size-1), 1);
+        }
+
+        return $password;
+    }
 }
 
 ?>
