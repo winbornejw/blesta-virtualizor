@@ -2735,6 +2735,19 @@ class virtualizor extends Module {
 
         return $password;
     }
+
+    /**
+     * Performs text replacement on the given text matching the given regex
+     *
+     * @param string $text The string to perform replacement on
+     * @param string $replacement The replacement text to use
+     * @param string $regex A valid PCRE pattern
+     * @return string The updated text
+     */
+    public function replaceText($text, $replacement, $regex)
+    {
+        return preg_replace($regex, $replacement, $text);
+    }
 }
 
 ?>
