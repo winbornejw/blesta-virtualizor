@@ -1518,6 +1518,12 @@ class virtualizor extends Module {
 		
 		$this->validateService($package, $vars);
 		
+		// Since validating the service rules does not update data in pre/post formatting,
+		// re-apply the formatting changes manually
+		if (isset($vars['virtualizor_domain'])) {
+			$vars['virtualizor_domain'] = $this->replaceText($vars['name'], "", "/^\s*www\./i");
+		}
+
 		// Is there a virt
 		if(empty($package->meta->type)){
 			$this->Input->setErrors(array('api' => array('internal' => 'Virtualization Type is empty : '.$package->meta->type)));
@@ -2142,14 +2148,14 @@ class virtualizor extends Module {
 		// Is it NEW MODULE ?
 		if(!empty($plan)){	
 			$post_vps = array();
-			$this->validateService($package, $vars);
+			$this->validateServiceEdit($service, $vars);
 			
 			$post_vps['plid'] = $plan;
 			
 			// Since validating the service rules does not update data in pre/post formatting,
 			// re-apply the formatting changes manually
-			if (isset($vars['name'])) {
-				$vars['name'] = $this->replaceText($vars['name'], "", "/^\s*www\./i");
+			if (isset($vars['virtualizor_domain'])) {
+				$vars['virtualizor_domain'] = $this->replaceText($vars['name'], "", "/^\s*www\./i");
 			}
 			// Check for fields that changed
 			$edit_fields = array();
@@ -2448,6 +2454,7 @@ class virtualizor extends Module {
 		$rules = array(
 			'virtualizor_domain' => array(
 				'format' => array(
+                    'pre_format' => [[$this, 'replaceText'], '', "/^\s*www\./i"],
 					'rule' => array(array($this, "validateHostName")),
 					'message' => 'Hostname Not Valid'
 				)
@@ -2458,6 +2465,30 @@ class virtualizor extends Module {
 		return $this->Input->validates($vars);
 	}
 	
+    /**
+     * Attempts to validate an existing service against a set of service info updates. Sets Input errors on failure.
+     *
+     * @param stdClass $service A stdClass object representing the service to validate for editing
+     * @param array $vars An array of user-supplied info to satisfy the request
+     * @return bool True if the service update validates or false otherwise. Sets Input errors when false.
+     */
+    public function validateServiceEdit($service, array $vars = null)
+    {
+        // Set rules
+        $rules = [
+            'virtualizor_domain' => [
+                'format' => [
+                    'if_set' => true,
+                    'pre_format' => [[$this, 'replaceText'], '', "/^\s*www\./i"],
+                    'rule' => [[$this, 'validateHostName'], true],
+					'message' => 'Hostname Not Valid'
+                ]
+            ],
+        ];
+        $this->Input->setRules($rules);
+        return $this->Input->validates($vars);
+	}
+
 	// Fetch Virtualizor Templates available for a VPS
 	public function virtTemplates($module_row, $vpsid) {
 	
