@@ -1521,7 +1521,7 @@ class virtualizor extends Module {
 		// Since validating the service rules does not update data in pre/post formatting,
 		// re-apply the formatting changes manually
 		if (isset($vars['virtualizor_domain'])) {
-			$vars['virtualizor_domain'] = $this->replaceText($vars['name'], "", "/^\s*www\./i");
+			$vars['virtualizor_domain'] = $this->replaceText($vars['virtualizor_domain'], "", "/^\s*www\./i");
 		}
 
 		// Is there a virt
@@ -2155,7 +2155,7 @@ class virtualizor extends Module {
 			// Since validating the service rules does not update data in pre/post formatting,
 			// re-apply the formatting changes manually
 			if (isset($vars['virtualizor_domain'])) {
-				$vars['virtualizor_domain'] = $this->replaceText($vars['name'], "", "/^\s*www\./i");
+				$vars['virtualizor_domain'] = $this->replaceText($vars['virtualizor_domain'], "", "/^\s*www\./i");
 			}
 			// Check for fields that changed
 			$edit_fields = array();
